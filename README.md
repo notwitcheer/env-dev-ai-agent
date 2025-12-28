@@ -80,15 +80,15 @@ const message: Message = {
 };
 ```
 
-### 2. Tools - Les Capacités de l'Agent
+### 2. Tools - Agent Capabilities
 
-Les **outils** sont les "super-pouvoirs" de l'agent. Chaque outil:
-- 📝 A un nom et une description
-- 🔧 Définit ses paramètres (avec validation)
-- ⚡ Exécute une action asynchrone
-- 🔒 Peut requérir des permissions
+**Tools** are the agent's “superpowers.” Each tool:
+- 📝 Has a name and description
+- 🔧 Defines its parameters (with validation)
+- ⚡ Performs an asynchronous action
+- 🔒 May require permissions
 
-**Créer un outil personnalisé:**
+**Create a custom tool:**
 
 ```typescript
 import { Tool, ToolResult } from './types/agent.types';
@@ -96,20 +96,20 @@ import { z } from 'zod';
 
 const weatherTool: Tool = {
   name: 'get_weather',
-  description: 'Obtient la météo pour une ville',
+  description: 'Get weather for a city',
 
   parameters: [
     {
       name: 'city',
       type: 'string',
-      description: 'Nom de la ville',
+      description: 'City name',
       required: true,
       schema: z.string().min(1)
     }
   ],
 
   async execute(params): Promise<ToolResult> {
-    // Votre logique ici
+    // Your code here
     const weather = await fetchWeather(params.city);
 
     return {
@@ -119,483 +119,236 @@ const weatherTool: Tool = {
   }
 };
 
-// Enregistrer l'outil
+// Save the tool
 globalToolRegistry.register(weatherTool);
 ```
 
-### 3. Context - La Conscience de l'Agent
+### 3. Context - Agent Awareness
 
-Le **contexte** contient tout ce que l'agent "sait":
+The **context** contains everything the agent “knows”:
 
 ```typescript
 interface AgentContext {
-  messages: Message[];           // Historique de conversation
-  environment: Record<string, any>; // Variables d'environnement
-  availableTools: string[];      // Outils disponibles
-  workingMemory: Record<string, any>; // Mémoire temporaire
-  sessionId: string;             // ID de session
-  parentAgentId?: string;        // Si c'est un subagent
+  messages: Message[];           // Conversation history
+  environment: Record<string, any>; // Environment variables
+  availableTools: string[];      // Available tools
+  workingMemory: Record<string, any>; // Temporary memory
+  sessionId: string;             // Session ID
+  parentAgentId?: string;        // If it is a subagent
 }
 ```
 
-### 4. Memory - Stockage d'État
+### 4. Memory - State Storage
 
-Le **MemoryManager** gère deux types de mémoire:
+The **MemoryManager** manages two types of memory:
 
-#### Mémoire de Travail (Working Memory)
-Temporaire, comme la RAM:
+#### Working Memory
+Temporary, like RAM:
 
 ```typescript
 const memory = agent.getMemory();
 
-// Stocker une valeur
-memory.set('user_preference', 'dark_mode');
+// Store a value
+memory.set(‘user_preference’, ‘dark_mode’);
 
-// Récupérer une valeur
-const pref = memory.get('user_preference');
+// Retrieve a value
+const pref = memory.get(‘user_preference’);
 
-// Lister toutes les clés
+// List all keys
 const keys = memory.keys();
 ```
 
-#### Mémoire de Conversation
-L'historique des messages:
+#### Conversation Memory
+Message history:
 
 ```typescript
-// Ajouter un message
+// Add a message
 memory.addMessage({
   role: MessageRole.USER,
-  content: 'Hello!',
+  content: ‘Hello!’,
   timestamp: new Date()
 });
 
-// Récupérer les 5 derniers messages
+// Retrieve the last 5 messages
 const recent = memory.getRecentMessages(5);
 
-// Rechercher dans l'historique
-const results = memory.searchMessages('config');
+// Search the history
+const results = memory.searchMessages(‘config’);
 ```
 
 #### Persistence
-Sauvegarder/charger depuis le disque:
+Save/load from disk:
 
 ```typescript
-// Sauvegarder
+// Save
 await memory.persist();
 
-// Charger
+// Load
 await memory.load();
 ```
 
-### 5. Agent Configuration - Le Blueprint
+5. Agent Configuration - The Blueprint
 
-La **configuration** définit un agent:
+The **configuration** defines an agent:
 
 ```typescript
 const config: AgentConfig = {
-  name: 'CodeAnalyzer',
-  description: 'Analyse du code source',
+  name: ‘CodeAnalyzer’,
+  description: ‘Source code analysis’,
 
-  // Prompt système - définit le comportement
-  systemPrompt: `Tu es un expert en analyse de code.
-  Tu peux lire des fichiers et identifier des bugs.`,
+  // System prompt - defines behavior
+  systemPrompt: `You are an expert in code analysis.
+  You can read files and identify bugs.`,
 
-  // Outils disponibles
-  tools: ['read_file', 'list_directory', 'search_code'],
+  // Available tools
+  tools: [‘read_file’, ‘list_directory’, ‘search_code’],
 
-  // Mode de fonctionnement
-  mode: 'autonomous', // ou 'interactive' ou 'planning'
+  // Operating mode
+  mode: ‘autonomous’, // or ‘interactive’ or 'planning'
 
-  // Capacités
+  // Capabilities
   canSpawnSubagents: true,
   maxSubagents: 3,
 
-  // Mémoire
+  // Memory
   memoryConfig: {
     enabled: true,
     persistToDisk: true,
-    memoryPath: './memory'
+    memoryPath: ‘./memory’
   },
 
-  // Limites de sécurité
+  // Security limits
   maxIterations: 50
 };
 ```
 
-### 6. Tool Registry - Le Gestionnaire d'Outils
+### 6. Tool Registry - The Tool Manager
 
-Le **ToolRegistry** centralise tous les outils:
+The **ToolRegistry** centralizes all tools:
 
 ```typescript
-import { globalToolRegistry } from './core/tool-registry';
+import { globalToolRegistry } from ‘./core/tool-registry’;
 
-// Enregistrer un outil
+// Register a tool
 globalToolRegistry.register(myTool);
 
-// Enregistrer plusieurs outils
+// Register multiple tools
 globalToolRegistry.registerMultiple([tool1, tool2, tool3]);
 
-// Lister tous les outils
+// List all tools
 const tools = globalToolRegistry.listTools();
 
-// Obtenir un outil
-const calculator = globalToolRegistry.getTool('calculator');
+// Get a tool
+const calculator = globalToolRegistry.getTool(‘calculator’);
 
-// Exécuter un outil
+// Execute a tool
 const result = await globalToolRegistry.executeTool(
-  'calculator',
-  { expression: '2 + 2' }
+  ‘calculator’,
+  { expression: ‘2 + 2’ }
 );
 ```
 
-### 7. Créer et Utiliser un Agent
+7. Create and Use an Agent
 
 ```typescript
-import { Agent } from './core/agent';
-import { globalToolRegistry } from './core/tool-registry';
+import { Agent } from ‘./core/agent’;
+import { globalToolRegistry } from ‘./core/tool-registry’;
 
-// 1. Setup des outils
+// 1. Set up the tools
 globalToolRegistry.registerMultiple(fileTools);
 globalToolRegistry.registerMultiple(utilityTools);
 
-// 2. Créer la configuration
+// 2. Create the configuration
 const config: AgentConfig = {
-  name: 'Assistant',
-  description: 'Un assistant utile',
-  systemPrompt: 'Tu es un assistant qui aide avec les fichiers.',
-  tools: ['read_file', 'write_file', 'calculator'],
-  mode: 'interactive'
+  name: ‘Assistant’,
+  description: ‘A useful assistant’,
+  systemPrompt: ‘You are an assistant who helps with files.’,
+  tools: [‘read_file’, ‘write_file’, ‘calculator’],
+  mode: ‘interactive’
 };
 
-// 3. Créer l'agent
+// 3. Create the agent
 const agent = new Agent(config, globalToolRegistry);
 
-// 4. Exécuter une tâche
-const response = await agent.execute('Calcule 15 * 23 + 100');
+// 4. Execute a task
+const response = await agent.execute(‘Calculate 15 * 23 + 100’);
 
 console.log(response.message);
-// Output: "Calculating the expression..."
+// Output: “Calculating the expression...”
 
-// 5. Vérifier la mémoire
+// 5. Check the memory
 const memory = agent.getMemory();
-console.log(memory.get('tool_result_calculator'));
+console.log(memory.get(‘tool_result_calculator’));
 // Output: { success: true, data: { result: 445 } }
 ```
 
-### 8. Subagents - Délégation de Tâches
+### 8. Subagents - Task Delegation
 
-Les **subagents** permettent de déléguer des tâches spécialisées:
+**Subagents** allow you to delegate specialized tasks:
 
 ```typescript
-// Configuration du subagent
+// Subagent configuration
 const subConfig: AgentConfig = {
-  name: 'SecurityAnalyzer',
-  description: 'Analyse de sécurité du code',
-  systemPrompt: 'Tu es un expert en sécurité.',
-  tools: ['read_file', 'search_vulnerabilities'],
-  mode: 'autonomous'
+  name: ‘SecurityAnalyzer’,
+  description: ‘Code security analysis’,
+  systemPrompt: ‘You are a security expert.’,
+  tools: [‘read_file’, ‘search_vulnerabilities’],
+  mode: ‘autonomous’
 };
 
-// L'agent principal spawne un subagent
+// The main agent spawns a subagent
 const result = await mainAgent.spawnSubagent(
   subConfig,
-  'Analyse ce fichier pour des vulnérabilités'
+  ‘Analyze this file for vulnerabilities’
 );
 
-// Le subagent exécute la tâche de manière autonome
+// The subagent executes the task autonomously
 console.log(result.message);
 ```
 
-## 🛠️ Outils Inclus
+## Security and Permissions
 
-### File Tools
-- **read_file** - Lit un fichier
-- **write_file** - Écrit dans un fichier
-- **list_directory** - Liste un répertoire
-
-### Utility Tools
-- **calculator** - Évalue des expressions mathématiques
-- **get_timestamp** - Obtient l'heure actuelle
-- **wait** - Attend un délai spécifié
-
-## 📖 Exemples Avancés
-
-### Exemple 1: Agent avec Mémoire Persistante
-
-```typescript
-const config: AgentConfig = {
-  name: 'PersistentAgent',
-  description: 'Agent qui se souvient entre sessions',
-  systemPrompt: 'Tu es un assistant avec mémoire.',
-  tools: ['calculator', 'read_file'],
-  memoryConfig: {
-    enabled: true,
-    persistToDisk: true,
-    memoryPath: './agent-memory'
-  }
-};
-
-const agent = new Agent(config, globalToolRegistry, 'session-123');
-
-// Première session
-await agent.execute('Mon nom est Alice');
-await agent.persist(); // Sauvegarde
-
-// Plus tard, nouvelle instance avec même sessionId
-const agent2 = new Agent(config, globalToolRegistry, 'session-123');
-await agent2.getMemory().load(); // Charge la mémoire
-// L'agent se souvient qu'on s'appelle Alice!
-```
-
-### Exemple 2: Pipeline Multi-Agents
-
-```typescript
-// Agent 1: Collecteur de données
-const collector = new Agent(dataCollectorConfig, globalToolRegistry);
-await collector.execute('Liste tous les fichiers .ts');
-
-// Agent 2: Analyseur (utilise les résultats de Agent 1)
-const analyzer = new Agent(analyzerConfig, globalToolRegistry);
-const files = collector.getMemory().get('file_list');
-await analyzer.execute(`Analyse ces fichiers: ${files}`);
-
-// Agent 3: Générateur de rapport
-const reporter = new Agent(reporterConfig, globalToolRegistry);
-const analysis = analyzer.getMemory().get('analysis_result');
-await reporter.execute(`Crée un rapport: ${analysis}`);
-```
-
-### Exemple 3: Tool Personnalisé avec Validation Zod
-
-```typescript
-import { z } from 'zod';
-
-const createUserTool: Tool = {
-  name: 'create_user',
-  description: 'Crée un nouvel utilisateur',
-
-  parameters: [
-    {
-      name: 'user',
-      type: 'object',
-      description: 'Données utilisateur',
-      required: true,
-      schema: z.object({
-        name: z.string().min(2).max(50),
-        email: z.string().email(),
-        age: z.number().min(18).max(120)
-      })
-    }
-  ],
-
-  requiresPermission: true,
-  permissionLevel: 'write',
-
-  async execute(params): Promise<ToolResult> {
-    const user = params.user;
-    // Zod a déjà validé les données!
-
-    await database.createUser(user);
-
-    return {
-      success: true,
-      data: { userId: '123', created: true }
-    };
-  }
-};
-```
-
-## 🔐 Sécurité et Permissions
-
-Les outils peuvent définir des **niveaux de permission**:
+Tools can define **permission levels**:
 
 ```typescript
 const dangerousTool: Tool = {
-  name: 'delete_database',
-  description: 'Supprime la base de données',
+  name: ‘delete_database’,
+  description: ‘Deletes the database’,
   requiresPermission: true,
-  permissionLevel: 'admin', // Nécessite admin
+  permissionLevel: ‘admin’, // Requires admin
 
   async execute(params): Promise<ToolResult> {
-    // Logique de suppression
+    // Deletion logic
   }
 };
 ```
 
-**Limites de sécurité dans AgentConfig:**
+**Security limits in AgentConfig:**
 
 ```typescript
 const config: AgentConfig = {
-  maxIterations: 100,  // Évite les boucles infinies
-  maxSubagents: 5,     // Limite le nombre de subagents
+  maxIterations: 100,  // Prevents infinite loops
+  maxSubagents: 5,     // Limits the number of subagents
   // ...
 };
 ```
 
-## 🎯 Cas d'Usage
+## Workflows and Modes
 
-### 1. Assistant de Code
+### Autonomous Mode
+The agent decides for itself what actions to take:
 ```typescript
-const codeAssistant = {
-  name: 'CodeHelper',
-  tools: ['read_file', 'write_file', 'search_code', 'run_tests'],
-  systemPrompt: 'Tu aides les développeurs avec leur code.'
-};
+mode: ‘autonomous’
 ```
 
-### 2. Data Pipeline
+### Interactive Mode
+The agent asks for confirmation before acting:
 ```typescript
-const dataPipeline = {
-  name: 'DataProcessor',
-  tools: ['read_csv', 'transform_data', 'write_database'],
-  canSpawnSubagents: true, // Pour traitement parallèle
-  systemPrompt: 'Tu transformes et charges des données.'
-};
+mode: ‘interactive’
 ```
 
-### 3. DevOps Automation
-```typescript
-const devopsAgent = {
-  name: 'DevOpsBot',
-  tools: ['ssh_execute', 'docker_command', 'kubernetes_apply'],
-  permissionLevel: 'admin',
-  systemPrompt: 'Tu gères le déploiement et l\'infrastructure.'
-};
-```
-
-## 🔄 Workflows et Modes
-
-### Mode Autonomous
-L'agent décide lui-même des actions à prendre:
-```typescript
-mode: 'autonomous'
-```
-
-### Mode Interactive
-L'agent demande confirmation avant d'agir:
-```typescript
-mode: 'interactive'
-```
-
-### Mode Planning
-L'agent crée un plan avant d'exécuter:
+### Planning Mode
+The agent creates a plan before executing:
 ```typescript
 mode: 'planning'
 ```
-
-## 📊 Monitoring et Debugging
-
-### Accès à l'État de l'Agent
-
-```typescript
-const state = agent.getState();
-
-console.log('Status:', state.status);
-console.log('Iterations:', state.iterations);
-console.log('Tools disponibles:', state.context.availableTools);
-console.log('Nombre de subagents:', state.subagents.size);
-```
-
-### Export de la Mémoire
-
-```typescript
-const memory = agent.getMemory();
-const memoryDump = memory.export();
-
-console.log(memoryDump); // JSON formaté
-```
-
-### Statistiques
-
-```typescript
-const stats = memory.getStats();
-// {
-//   workingMemorySize: 5,
-//   conversationLength: 12,
-//   sessionId: 'abc-123'
-// }
-```
-
-## 🚧 Prochaines Étapes / Roadmap
-
-### Phase 1 ✅ (Actuelle)
-- [x] Architecture de base des agents
-- [x] Tool registry et système d'outils
-- [x] Memory management
-- [x] Subagents support
-- [x] Exemples de démonstration
-
-### Phase 2 (À venir)
-- [ ] **LLM Integration** - Brancher OpenAI/Claude/etc
-- [ ] **Plugin System** - Charger des plugins dynamiquement
-- [ ] **MCP Integration** - Model Context Protocol
-- [ ] **Skills** - Commandes slash personnalisées
-- [ ] **Hooks** - Événements avant/après actions
-- [ ] **Web UI** - Interface graphique de monitoring
-
-### Phase 3 (Avancé)
-- [ ] **Workflow Builder** - GUI pour créer des workflows
-- [ ] **LSP Integration** - Auto-complétion pour configs
-- [ ] **Multi-Agent Orchestration** - Coordination complexe
-- [ ] **Distributed Agents** - Agents sur plusieurs machines
-- [ ] **Agent Marketplace** - Partager/télécharger des agents
-
-## 💡 Concepts à Explorer
-
-### 1. Prompts et Context Windows
-- Comment optimiser les prompts système
-- Gestion de la taille du contexte pour LLMs
-- Stratégies de résumé automatique
-
-### 2. Memory Strategies
-- Mémoire vectorielle (embeddings)
-- Retrieval-Augmented Generation (RAG)
-- Compression de l'historique
-
-### 3. Multi-Agent Coordination
-- Patterns de communication inter-agents
-- Résolution de conflits
-- Load balancing entre agents
-
-### 4. Tool Design Patterns
-- Tools composables
-- Tool chaining
-- Error handling et retry logic
-
-## 📚 Resources Utiles
-
-- **TypeScript Handbook**: https://www.typescriptlang.org/docs/
-- **Zod Documentation**: https://zod.dev/
-- **Claude API**: https://docs.anthropic.com/
-- **OpenAI API**: https://platform.openai.com/docs/
-- **LangChain** (inspiration): https://js.langchain.com/
-
-## 🤝 Contribution
-
-Ce projet est un framework d'apprentissage. Suggestions d'améliorations:
-
-1. **Nouveaux Outils**: Créez des outils pour APIs, databases, etc.
-2. **Agents Spécialisés**: Partagez vos configurations d'agents
-3. **Exemples**: Ajoutez des cas d'usage réels
-4. **Documentation**: Améliorez les explications
-
-## 📝 License
-
-MIT License - Libre d'utilisation et modification
-
----
-
-## 🎓 Conclusion
-
-Vous avez maintenant un framework complet pour:
-- ✅ Créer des agents autonomes
-- ✅ Définir des outils personnalisés
-- ✅ Gérer la mémoire et le contexte
-- ✅ Orchestrer des subagents
-- ✅ Builder des systèmes multi-agents complexes
-
-**Prochaine étape**: Branchez un vrai LLM (OpenAI, Claude, etc.) pour des agents vraiment intelligents!
-
-Pour des questions ou suggestions, ouvrez une issue sur GitHub.
-
-Happy Agent Building! 🚀
