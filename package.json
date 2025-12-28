@@ -1,14 +1,19 @@
 {
-  "name": "aiagenttest",
+  "name": "multi-agent-dev-env",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A flexible multi-agent development environment for building AI agent systems",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "tsx src/examples/basic-agent.ts",
+    "demo": "npm run build && node dist/examples/basic-agent.js",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build"
   },
-  "keywords": [],
+  "keywords": ["ai", "agents", "multi-agent", "tools", "llm", "automation"],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^25.0.3",
