@@ -1,80 +1,80 @@
-# 📚 Guide d'Apprentissage - Multi-Agent Systems
+# 📚 Learning Guide - Multi-Agent Systems
 
-Ce guide récapitule tout ce que vous avez appris en construisant ce projet.
+This guide summarizes everything you have learned while building this project.
 
-## 🎯 Concepts Maîtrisés
+## 🎯 Concepts Mastered
 
-### 1. Architecture d'Agents IA
+### 1. AI Agent Architecture
 
-#### Qu'est-ce qu'un Agent?
-Un **agent** est une entité autonome qui:
-- Perçoit son environnement (via le **contexte**)
-- Raisonne sur quoi faire (via un **LLM** ou logique)
-- Agit avec des **outils**
-- Apprend et se souvient (via la **mémoire**)
+#### What is an Agent?
+An **agent** is an autonomous entity that:
+- Perceives its environment (via **context**)
+- Reasons about what to do (via **LLM** or logic)
+- Acts with **tools**
+- Learns and remembers (via **memory**)
 
-#### Architecture en couches
+#### Layered Architecture
 ```
 ┌─────────────────────────────────┐
-│   Interface (User/API)          │  ← Point d'entrée
+│   Interface (User/API)          │  ← Entry point
 ├─────────────────────────────────┤
 │   Agent Runtime                 │  ← Orchestration
 │   - Lifecycle management        │
 │   - Reasoning (LLM)             │
 ├─────────────────────────────────┤
 │   Core Services                 │
-│   - Tool Registry               │  ← Capacités
-│   - Memory Manager              │  ← État
-│   - Context Manager             │  ← Conscience
+│   - Tool Registry               │  ← Capabilities
+│   - Memory Manager              │  ← State
+│   - Context Manager             │  ← Awareness
 ├─────────────────────────────────┤
 │   Infrastructure                │
-│   - MCP Servers                 │  ← Connexions externes
+│   - MCP Servers                 │  ← External Connections
 │   - Skills                      │  ← Workflows
-│   - Hooks                       │  ← Extensibilité
+│   - Hooks                       │  ← Extensibility
 └─────────────────────────────────┘
 ```
 
 ---
 
-### 2. Tool System (Système d'Outils)
+### 2. Tool System
 
-#### Pourquoi des outils?
-Les LLMs seuls peuvent seulement **parler**. Les outils leur donnent des **mains** pour agir.
+#### Why tools?
+LLMs alone can only **talk**. Tools give them **hands** to act.
 
-#### Anatomie d'un outil
+#### Anatomy of a tool
 ```typescript
 const myTool: Tool = {
-  // Identité
-  name: 'send_email',
-  description: 'Envoie un email',
+  // Identity
+  name: ‘send_email’,
+  description: ‘Sends an email’,
 
-  // Contrat (paramètres avec validation)
+  // Contract (parameters with validation)
   parameters: [
     {
-      name: 'to',
-      type: 'string',
+      name: ‘to’,
+      type: ‘string’,
       required: true,
-      schema: z.string().email()  // Validation Zod!
+      schema: z.string().email()  // Zod validation!
     }
   ],
 
-  // Sécurité
+  // Security
   requiresPermission: true,
-  permissionLevel: 'write',
+  permissionLevel: ‘write’,
 
   // Action
   async execute(params) {
-    // Votre logique ici
+    // Your logic here
     await sendEmail(params.to, params.subject, params.body);
     return { success: true };
   }
 };
 ```
 
-#### Design Patterns pour Outils
+#### Design Patterns for Tools
 
 **1. Composition**
-Combiner des outils simples en outils complexes:
+Combine simple tools into complex tools:
 ```typescript
 const deployTool = compositeOf([
   runTestsTool,
@@ -85,7 +85,7 @@ const deployTool = compositeOf([
 ```
 
 **2. Error Handling**
-Toujours retourner `ToolResult` avec success/error:
+Always return `ToolResult` with success/error:
 ```typescript
 try {
   const result = await doSomething();
@@ -96,126 +96,126 @@ try {
 ```
 
 **3. Idempotence**
-Les outils doivent être sûrs à réexécuter:
+Tools must be safe to re-execute:
 ```typescript
-// BAD: Crée un fichier (échoue si existe)
+// BAD: Creates a file (fails if it exists)
 await fs.writeFile(path, content);
 
-// GOOD: Remplace ou crée
-await fs.writeFile(path, content, { flag: 'w' });
+// GOOD: Replaces or creates
+await fs.writeFile(path, content, { flag: ‘w’ });
 ```
 
 ---
 
-### 3. Memory Management (Gestion de Mémoire)
+### 3. Memory Management
 
-#### Types de mémoire
+#### Types of Memory
 
-**Working Memory (RAM)**
+**Random Access Memory (RAM)**
 ```typescript
-memory.set('user_name', 'Alice');
-memory.set('preferences', { theme: 'dark' });
+memory.set(“user_name”, “Alice”);
+memory.set(“preferences”, { theme: “dark” });
 
-// Plus tard...
-const name = memory.get('user_name');  // 'Alice'
+// Later...
+const name = memory.get(“user_name”);  // “Alice”
 ```
 
-**Conversation Memory (Historique)**
+**Conversation Memory (History)**
 ```typescript
 memory.addMessage({
-  role: 'user',
-  content: 'Hello!',
+  role: “user”,
+  content: “Hello!”,
   timestamp: new Date()
 });
 
-// Récupérer les 10 derniers
+// Retrieve the last 10
 const recent = memory.getRecentMessages(10);
 ```
 
-**Long-term Memory (Disque)**
+**Long-term memory (Disk)**
 ```typescript
-// Sauvegarder
+// Save
 await memory.persist();
 
-// Charger (nouvelle session)
+// Load (new session)
 await memory.load();
 ```
 
-#### Stratégies de Mémoire Avancées
+#### Advanced memory strategies
 
-**1. Sliding Window**
-Garder seulement N messages récents pour économiser tokens:
+**1. Sliding window**
+Keep only N recent messages to save tokens:
 ```typescript
 const WINDOW_SIZE = 20;
 const context = memory.getRecentMessages(WINDOW_SIZE);
 ```
 
-**2. Summarization**
-Résumer l'ancien historique:
+**2. Summary**
+Summarize the old history:
 ```typescript
 if (memory.getMessages().length > 100) {
   const summary = await llm.summarize(oldMessages);
-  memory.set('conversation_summary', summary);
-  memory.clearOldMessages(50);  // Garder seulement 50 récents
+  memory.set(“conversation_summary”, summary);
+  memory.clearOldMessages(50);  // Keep only the 50 most recent messages
 }
 ```
 
-**3. Semantic Search (avec vectors)**
+**3. Semantic search (with vectors)**
 ```typescript
-// Chercher les messages les plus pertinents
+// Search for the most relevant messages
 const relevant = await memory.searchSemantic(
-  "How do I deploy?",
+  “How do I deploy?”,
   topK: 5
 );
 ```
 
 ---
 
-### 4. Context (Contexte)
+### 4. Context
 
-Le **contexte** est "tout ce que l'agent sait en ce moment".
+The **context** is “everything the agent knows at this moment.”
 
-#### Composants du contexte
+#### Context components
 ```typescript
 interface AgentContext {
-  // Qui parle? (historique)
+  // Who is speaking? (history)
   messages: Message[];
 
-  // Quoi faire? (outils disponibles)
+  // What to do? (available tools)
   availableTools: string[];
 
-  // Où sommes-nous? (environnement)
+  // Where are we? (environment)
   environment: {
     workingDirectory: string;
     user: string;
     timestamp: Date;
   };
 
-  // Qu'avons-nous fait? (mémoire)
+  // What have we done? (memory)
   workingMemory: Record<string, any>;
 
   // Metadata
   sessionId: string;
-  parentAgentId?: string;  // Si subagent
+  parentAgentId?: string;  // If subagent
 }
 ```
 
 #### Context Window Optimization
 
-Le contexte a une **taille limitée** (tokens):
+The context has a **limited size** (tokens):
 ```typescript
-// Stratégie 1: Prioriser
+// Strategy 1: Prioritize
 const context = [
-  systemPrompt,              // Toujours
-  conversationSummary,       // Si existe
-  ...recentMessages(10),     // Les 10 derniers
-  currentTask,               // Toujours
+  systemPrompt,              // Always
+  conversationSummary,       // If exists
+  ...recentMessages(10),     // The last 10
+  currentTask,               // Always
 ];
 
-// Stratégie 2: Compresser
+// Strategy 2: Compress
 const compressed = compressContext(fullContext, maxTokens: 4000);
 
-// Stratégie 3: Chunking
+// Strategy 3: Chunking
 const chunks = splitContext(largeContext, chunkSize: 2000);
 for (const chunk of chunks) {
   await processChunk(chunk);
@@ -224,78 +224,78 @@ for (const chunk of chunks) {
 
 ---
 
-### 5. Prompts (Art du Prompting)
+### 5. Prompts (The Art of Prompting)
 
-#### Anatomy d'un bon System Prompt
+#### Anatomy of a Good System Prompt
 
 ```typescript
 const systemPrompt = `
-# IDENTITÉ
-Tu es ${agentName}, un ${agentRole}.
+# IDENTITY
+You are ${agentName}, a ${agentRole}.
 
-# OBJECTIF
-Ta mission est de ${agentGoal}.
+# OBJECTIVE
+Your mission is to ${agentGoal}.
 
-# CAPACITÉS
-Tu as accès aux outils suivants:
+# CAPABILITIES
+You have access to the following tools:
 ${toolDescriptions}
 
-# CONTRAINTES
-- Ne jamais ${constraint1}
-- Toujours ${constraint2}
-- Maximum ${maxIterations} itérations
+# CONSTRAINTS
+- Never ${constraint1}
+- Always ${constraint2}
+- Maximum ${maxIterations} iterations
 
 # STYLE
-- Sois ${personality}
-- Réponds en ${language}
+- Be ${personality}
+- Respond in ${language}
 - Format: ${format}
 
-# EXEMPLES
-User: "${exampleInput}"
+# EXAMPLES
+User: “${exampleInput}”
 Assistant: ${exampleOutput}
 `;
 ```
 
-#### Techniques de Prompting
+Prompting Techniques
 
 **1. Few-Shot Learning**
-Donne des exemples:
+Give examples:
 ```typescript
 const prompt = `
-Voici comment analyser du code:
+Here's how to analyze code:
 
 Example 1:
-Input: "function add(a, b) { return a + b }"
-Output: "Simple addition function, no issues"
+Input: “function add(a, b) { return a + b }”
+Output: “Simple addition function, no problem”
 
 Example 2:
-Input: "eval(userInput)"
-Output: "CRITICAL: eval() is dangerous, use JSON.parse"
+Input: “eval(userInput)”
+Output: “CRITICAL: eval() is dangerous, use JSON.parse”
 
 Now analyze:
-Input: "${codeToAnalyze}"
+Input: “${codeToAnalyze}”
 Output:
 `;
 ```
 
-**2. Chain-of-Thought**
-Demande au LLM d'expliquer son raisonnement:
+**2. Thought Process**
+Ask the LLM to explain its reasoning:
 ```typescript
 const prompt = `
-Analyse cette requête: "${userQuery}"
+Analyze this query: “${userQuery}”
 
-Pense étape par étape:
-1. Quel est l'objectif?
-2. Quels outils utiliser?
-3. Dans quel ordre?
-4. Quels paramètres?
+Think step by step:
+1. What is the goal?
+2. What tools to use?
+3. In what order?
+4. What parameters?
 
-Ensuite, exécute.
+Then execute.
 `;
 ```
 
-**3. Self-Consistency**
-Demande plusieurs solutions et choisis la meilleure:
+**3. Internal consistency**
+Request multiple solutions and choose the best one:
 ```typescript
 const solutions = await Promise.all([
   llm.solve(problem, temperature: 0.7),
@@ -308,57 +308,57 @@ const best = chooseBest(solutions);
 
 ---
 
-### 6. Subagents (Délégation)
+### 6. Subagents (Delegation)
 
-#### Pourquoi des subagents?
+#### Why subagents?
 
-**Spécialisation**: Chaque agent est expert dans son domaine
+**Specialization**: Each agent is an expert in its field
 ```typescript
 const mainAgent = new Agent({
-  name: 'Orchestrator',
+  name: ‘Orchestrator’,
   canSpawnSubagents: true
 });
 
-// Déléguer à un expert
+// Delegate to an expert
 const securityReport = await mainAgent.spawnSubagent({
-  name: 'SecurityExpert',
-  tools: ['scan_vulnerabilities', 'check_dependencies'],
-  systemPrompt: 'Tu es un expert en sécurité.'
-}, 'Analyse la sécurité de ce code');
+  name: ‘SecurityExpert’,
+  tools: [‘scan_vulnerabilities’, ‘check_dependencies’],
+  systemPrompt: ‘You are a security expert.’
+}, ‘Analyze the security of this code’);
 ```
 
-#### Patterns de Coordination
+#### Coordination Patterns
 
 **1. Pipeline**
 ```typescript
-// Agent 1: Collecte
-const data = await dataCollector.execute('Gather user data');
+// Agent 1: Collection
+const data = await dataCollector.execute(‘Gather user data’);
 
 // Agent 2: Transformation
 const transformed = await transformer.execute(`Transform: ${data}`);
 
-// Agent 3: Chargement
+// Agent 3: Load
 await loader.execute(`Load: ${transformed}`);
 ```
 
 **2. Map-Reduce**
 ```typescript
-// Map: Plusieurs subagents en parallèle
-const files = ['a.ts', 'b.ts', 'c.ts'];
+// Map: Multiple subagents in parallel
+const files = [‘a.ts’, ‘b.ts’, ‘c.ts’];
 const analyses = await Promise.all(
-  files.map(file =>
+  files.map (file =>
     mainAgent.spawnSubagent(analyzerConfig, `Analyze ${file}`)
   )
 );
 
-// Reduce: Combiner les résultats
+// Reduce: Combine results
 const finalReport = combineAnalyses(analyses);
 ```
 
 **3. Hierarchical**
 ```typescript
 // CEO Agent
-const ceo = new Agent({ name: 'CEO' });
+const ceo = new Agent({ name: ‘CEO’ });
 
 // Manager Agents
 const devManager = await ceo.spawnSubagent(devManagerConfig);
@@ -375,35 +375,35 @@ const tester = await qaManager.spawnSubagent(testerConfig);
 
 #### Concept
 
-MCP permet de **brancher des sources de données** dynamiquement.
+MCP allows you to **connect data sources** dynamically.
 
-**Sans MCP**:
+**Without MCP**:
 ```typescript
-// Codé en dur
+// Hard-coded
 const githubTool = createGitHubTool();
 const notionTool = createNotionTool();
 ```
 
-**Avec MCP**:
+**With MCP**:
 ```typescript
-// Découverte automatique
+// Automatic discovery
 const mcpServers = discoverMCPServers();
 const tools = await mcpClient.getToolsFromServers(mcpServers);
-// Boom! Tous les outils GitHub, Notion, etc. disponibles
+// Boom! All GitHub, Notion, etc. tools available
 ```
 
-#### Créer un MCP Server
+#### Create an MCP Server
 
 ```typescript
 class CustomMCPServer implements MCPServer {
-  name = 'my-service';
+  name = ‘my-service’;
   capabilities = { tools: true, resources: true };
 
   async listTools(): Promise<MCPTool[]> {
     return [
       {
-        name: 'do_something',
-        description: 'Does something cool',
+        name: ‘do_something’,
+        description: ‘Does something cool’,
         inputSchema: { /* JSON Schema */ }
       }
     ];
@@ -411,7 +411,7 @@ class CustomMCPServer implements MCPServer {
 
   async callTool(name: string, params: any): Promise<any> {
     switch (name) {
-      case 'do_something':
+      case ‘do_something’:
         return await this.doSomething(params);
       default:
         throw new Error(`Unknown tool: ${name}`);
@@ -421,9 +421,9 @@ class CustomMCPServer implements MCPServer {
   async listResources(): Promise<MCPResource[]> {
     return [
       {
-        uri: 'custom://resource/123',
-        name: 'My Resource',
-        description: 'A cool resource'
+        uri: ‘custom://resource/123’,
+        name: ‘My Resource’,
+        description: ‘A cool resource’
       }
     ];
   }
@@ -436,16 +436,16 @@ class CustomMCPServer implements MCPServer {
 
 ---
 
-### 8. Skills (Workflows Réutilisables)
+### 8. Skills (Reusable Workflows)
 
 #### Concept
 
-Les **skills** sont des séquences d'actions complexes, empaquetées comme une commande.
+**Skills** are sequences of complex actions, packaged as a command.
 
 ```typescript
 const codeReviewSkill: Skill = {
-  name: 'Code Review',
-  command: '/review-code',
+  name: ‘Code Review’,
+  command: ‘/review-code’,
 
   async execute({ agent, args }) {
     // 1. List files
@@ -472,12 +472,12 @@ const codeReviewSkill: Skill = {
 #### Skill Composition
 
 ```typescript
-// Skill simple
-const testSkill = createSkill('/test', runTests);
-const buildSkill = createSkill('/build', runBuild);
+// Simple skill
+const testSkill = createSkill(‘/test’, runTests);
+const buildSkill = createSkill(‘/build’, runBuild);
 
-// Skill composé
-const ciSkill = composeSkills('/ci', [
+// Composite skill
+const ciSkill = composeSkills(‘/ci’, [
   testSkill,
   buildSkill,
   deploySkill
@@ -486,36 +486,36 @@ const ciSkill = composeSkills('/ci', [
 
 ---
 
-### 9. Hooks (Extensibilité)
+### 9. Hooks (Extensibility)
 
 #### Concept
 
-Les **hooks** permettent d'injecter du code à des moments clés.
+**Hooks** allow you to inject code at key moments.
 
 ```typescript
 // Hook: Logger
-agent.onHook('beforeToolExecution', async ({ data }) => {
+agent.onHook(‘beforeToolExecution’, async ({ data }) => {
   console.log(`🔧 Executing: ${data.toolCall.toolName}`);
 });
 
 // Hook: Analytics
-agent.onHook('afterToolExecution', async ({ data }) => {
-  analytics.track('tool_used', {
+agent.onHook(‘afterToolExecution’, async ({ data }) => {
+  analytics.track(‘tool_used’, {
     tool: data.toolCall.toolName,
     success: data.result.success
-  });
+});
 });
 
 // Hook: Security
-agent.onHook('beforeToolExecution', async ({ data }) => {
+agent.onHook(‘beforeToolExecution’, async ({ data }) => {
   if (isDangerous(data.toolCall)) {
-    throw new Error('Blocked for security');
+    throw new Error(‘Blocked for security’);
   }
 });
 
 // Hook: Cost Tracking
 let totalCost = 0;
-agent.onHook('afterThink', async ({ data }) => {
+agent.onHook(‘afterThink’, async ({ data }) => {
   const cost = calculateCost(data.response.metadata.usage);
   totalCost += cost;
   console.log(`💰 Total: $${totalCost.toFixed(2)}`);
@@ -524,46 +524,46 @@ agent.onHook('afterThink', async ({ data }) => {
 
 ---
 
-### 10. Modes d'Agents
+### 10. Agent Modes
 
 #### Autonomous Mode
-L'agent décide tout seul:
+The agent decides everything on its own:
 ```typescript
 const agent = new Agent({
-  mode: 'autonomous',
+  mode: ‘autonomous’,
   maxIterations: 50
 });
 
-await agent.execute('Deploy the app to production');
-// L'agent va:
+await agent.execute(‘Deploy the app to production’);
+// The agent will:
 // 1. Run tests
 // 2. Build
 // 3. Upload
 // 4. Notify
-// Sans demander de confirmation
+// Without asking for confirmation
 ```
 
 #### Interactive Mode
-L'agent demande confirmation:
+The agent asks for confirmation:
 ```typescript
 const agent = new Agent({
-  mode: 'interactive'
+  mode: ‘interactive’
 });
 
-await agent.execute('Delete all user data');
-// L'agent va demander:
-// "⚠️ This will delete all data. Confirm? (y/n)"
+await agent.execute(‘Delete all user data’);
+// The agent will ask:
+// “⚠️ This will delete all data. Confirm? (y/n)”
 ```
 
 #### Planning Mode
-L'agent crée un plan d'abord:
+The agent creates a plan first:
 ```typescript
 const agent = new Agent({
-  mode: 'planning'
+  mode: ‘planning’
 });
 
-await agent.execute('Refactor the codebase');
-// L'agent retourne:
+await agent.execute(‘Refactor the codebase’);
+// The agent returns:
 // Plan:
 // 1. Analyze current structure
 // 2. Identify patterns to extract
@@ -574,141 +574,3 @@ await agent.execute('Refactor the codebase');
 //
 // Approve? (y/n)
 ```
-
----
-
-## 🎓 Patterns & Best Practices
-
-### Pattern 1: Error Recovery
-
-```typescript
-async function executeWithRetry(
-  tool: string,
-  params: any,
-  maxRetries = 3
-): Promise<ToolResult> {
-  for (let i = 0; i < maxRetries; i++) {
-    const result = await toolRegistry.executeTool(tool, params);
-
-    if (result.success) {
-      return result;
-    }
-
-    console.log(`Retry ${i + 1}/${maxRetries}`);
-    await wait(1000 * Math.pow(2, i));  // Exponential backoff
-  }
-
-  throw new Error('Max retries exceeded');
-}
-```
-
-### Pattern 2: Circuit Breaker
-
-```typescript
-class CircuitBreaker {
-  private failures = 0;
-  private lastFailure?: Date;
-
-  async execute(fn: () => Promise<any>) {
-    // Si trop d'échecs récents, fail fast
-    if (this.failures > 5 && this.isRecent(this.lastFailure)) {
-      throw new Error('Circuit breaker open');
-    }
-
-    try {
-      const result = await fn();
-      this.failures = 0;  // Reset on success
-      return result;
-    } catch (error) {
-      this.failures++;
-      this.lastFailure = new Date();
-      throw error;
-    }
-  }
-}
-```
-
-### Pattern 3: Agent Pool
-
-```typescript
-class AgentPool {
-  private agents: Agent[] = [];
-  private busy = new Set<string>();
-
-  async acquire(): Promise<Agent> {
-    // Chercher un agent libre
-    const available = this.agents.find(a => !this.busy.has(a.state.id));
-
-    if (available) {
-      this.busy.add(available.state.id);
-      return available;
-    }
-
-    // Créer un nouveau si besoin
-    const agent = new Agent(config, toolRegistry);
-    this.agents.push(agent);
-    this.busy.add(agent.state.id);
-    return agent;
-  }
-
-  release(agent: Agent): void {
-    this.busy.delete(agent.state.id);
-  }
-}
-```
-
----
-
-## 🚀 Prochaines Étapes
-
-### Cette Semaine
-1. ✅ **Comprendre l'architecture** - FAIT!
-2. 🔄 **Intégrer un LLM** - Voir [INTEGRATION_LLM.md](INTEGRATION_LLM.md)
-3. 🔄 **Créer vos propres outils**
-
-### Ce Mois
-1. Implémenter MCP servers
-2. Créer des skills custom
-3. Tester en conditions réelles
-
-### Ce Trimestre
-1. Web UI
-2. Plugin system
-3. Production deployment
-
----
-
-## 📖 Resources
-
-### Lectures Essentielles
-- [LangChain Docs](https://js.langchain.com/) - Framework similaire
-- [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) - Agent autonome
-- [Claude API Docs](https://docs.anthropic.com/) - Pour l'intégration
-- [OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling)
-
-### Concepts Avancés
-- **Reinforcement Learning** pour agents
-- **Multi-Agent RL** (coordination)
-- **Prompt Engineering** techniques
-- **RAG** (Retrieval-Augmented Generation)
-
-### Projets Inspirants
-- [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT)
-- [BabyAGI](https://github.com/yoheinakajima/babyagi)
-- [GPT-Engineer](https://github.com/gpt-engineer-org/gpt-engineer)
-
----
-
-## 🎉 Conclusion
-
-Vous avez maintenant:
-- ✅ Un framework d'agents complet
-- ✅ Compréhension des concepts clés
-- ✅ Les bases pour construire des systèmes complexes
-- ✅ Une roadmap claire pour continuer
-
-**Le plus important**: Vous comprenez **pourquoi** chaque partie existe, pas seulement **comment** elle fonctionne.
-
-Continuez à expérimenter, à casser des choses, et à apprendre!
-
-Happy coding! 🚀
