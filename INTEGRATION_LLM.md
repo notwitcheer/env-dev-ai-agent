@@ -1,51 +1,40 @@
-# 🧠 Intégration LLM - Guide Complet
+# 🧠 LLM Integration - Complete Guide
 
-Ce guide explique comment intégrer un vrai LLM (Large Language Model) dans votre système d'agents.
+This guide explains how to integrate a real LLM (Large Language Model) into your agent system.
 
-## 📋 Table des Matières
+## 📋 Table of Contents
 
-1. [Pourquoi intégrer un LLM?](#pourquoi-intégrer-un-llm)
-2. [Options disponibles](#options-disponibles)
-3. [Intégration OpenAI](#intégration-openai)
-4. [Intégration Anthropic (Claude)](#intégration-anthropic-claude)
-5. [Architecture de l'intégration](#architecture-de-lintégration)
-6. [Gestion des prompts](#gestion-des-prompts)
-7. [Optimisation des coûts](#optimisation-des-coûts)
+1. [Why integrate an LLM?](#why-integrate-an-llm)
+2. [Available options](#available-options)
+3. [OpenAI integration](#openai-integration)
+4. [Anthropic (Claude) Integration](#anthropic-claude-integration)
+5. [Integration Architecture](#integration-architecture)
+6. [Prompt Management](#prompt-management)
+7. [Cost Optimization](#cost-optimization)
 
-## Pourquoi intégrer un LLM?
+## Why integrate an LLM?
 
-Actuellement, notre système **simule** le raisonnement dans la méthode `think()`:
+Currently, our system **simulates** reasoning in the `think()` method:
 
 ```typescript
-// Version actuelle (simulation)
+// Current version (simulation)
 private async think(input: string): Promise<AgentResponse> {
-  // Parse basique de l'input
-  if (input.includes('calculate')) {
-    return { toolCalls: [{ toolName: 'calculator', ... }] };
+  // Basic parsing of input
+  if (input.includes(‘calculate’)) {
+    return { toolCalls: [{ toolName: ‘calculator’, ... }] };
   }
   // ...
 }
 ```
 
-Avec un **vrai LLM**, l'agent peut:
-- ✅ Comprendre des instructions complexes en langage naturel
-- ✅ Raisonner sur quelle séquence d'outils utiliser
-- ✅ Générer des réponses conversationnelles naturelles
-- ✅ Adapter sa stratégie selon le contexte
-- ✅ Apprendre de l'historique de conversation
+With a **real LLM**, the agent can:
+- ✅ Understand complex instructions in natural language
+- ✅ Reason about which sequence of tools to use
+- ✅ Generate natural conversational responses
+- ✅ Adapt its strategy according to the context
+- ✅ Learn from conversation history
 
-## Options disponibles
-
-| Provider | Modèle | Prix | Avantages | Use Case |
-|----------|--------|------|-----------|----------|
-| **OpenAI** | GPT-4o | $$$ | Très performant, tool calling natif | Production, tâches complexes |
-| **OpenAI** | GPT-4o-mini | $ | Bon rapport qualité/prix | Développement, tâches simples |
-| **Anthropic** | Claude 3.5 Sonnet | $$ | Excellent raisonnement, long context | Analyse, coding |
-| **Anthropic** | Claude 3 Haiku | $ | Rapide et économique | Tâches simples, high volume |
-| **Google** | Gemini Pro | $$ | Multimodal, bon contexte | Vision + text |
-| **Local** | Ollama (Llama 3) | Gratuit | Privé, offline | Privacy-critical |
-
-## Intégration OpenAI
+## OpenAI Integration
 
 ### Installation
 
@@ -55,67 +44,67 @@ npm install openai
 
 ### Configuration
 
-Créez un fichier `.env`:
+Create a `.env` file:
 
 ```env
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-### Implémentation
+### Implementation
 
-Créez `src/llm/openai-provider.ts`:
+Create `src/llm/openai-provider.ts`:
 
 ```typescript
-import OpenAI from 'openai';
-import { Message, MessageRole, ToolCall, AgentResponse } from '../types/agent.types';
-import { Tool } from '../types/agent.types';
+import OpenAI from ‘openai’;
+import { Message, MessageRole, ToolCall, AgentResponse } from ‘../types/agent.types’;
+import { Tool } from ‘../types/agent.types’;
 
 export class OpenAIProvider {
   private client: OpenAI;
   private model: string;
 
-  constructor(apiKey: string, model: string = 'gpt-4o-mini') {
+  constructor(apiKey: string, model: string = ‘gpt-4o-mini’) {
     this.client = new OpenAI({ apiKey });
     this.model = model;
   }
 
   /**
-   * Convertit nos messages au format OpenAI
+   * Converts our messages to OpenAI format
    */
   private convertMessages(messages: Message[]): OpenAI.ChatCompletionMessageParam[] {
     return messages.map(msg => {
       switch (msg.role) {
         case MessageRole.SYSTEM:
-          return { role: 'system', content: msg.content };
+          return { role: ‘system’, content: msg.content };
         case MessageRole.USER:
-          return { role: 'user', content: msg.content };
+          return { role: ‘user’, content: msg.content };
         case MessageRole.ASSISTANT:
-          return { role: 'assistant', content: msg.content };
+          return { role: ‘assistant’, content: msg.content };
         case MessageRole.TOOL:
-          // OpenAI appelle ça 'function'
+          // OpenAI calls this ‘function’
           return {
-            role: 'function' as any,
-            name: msg.metadata?.toolName || 'unknown',
+            role: ‘function’ as any,
+            name: msg.metadata?.toolName || ‘unknown’,
             content: msg.content
           };
         default:
-          return { role: 'user', content: msg.content };
+          return { role: ‘user’, content: msg.content };
       }
     });
   }
 
   /**
-   * Convertit nos tools au format OpenAI Function Calling
+   * Converts our tools to the OpenAI Function Calling format
    */
   private convertTools(tools: Tool[]): OpenAI.ChatCompletionTool[] {
     return tools.map(tool => ({
-      type: 'function',
+      type: “function”,
       function: {
         name: tool.name,
         description: tool.description,
         parameters: {
-          type: 'object',
+          type: “object”,
           properties: tool.parameters.reduce((acc, param) => {
             acc[param.name] = {
               type: param.type,
@@ -132,7 +121,7 @@ export class OpenAIProvider {
   }
 
   /**
-   * Appelle l'API OpenAI pour obtenir une réponse
+   * Call the OpenAI API to get a response
    */
   async complete(
     systemPrompt: string,
@@ -140,29 +129,29 @@ export class OpenAIProvider {
     availableTools: Tool[],
     userInput: string
   ): Promise<AgentResponse> {
-    // Construire les messages
+    // Build messages
     const messages: OpenAI.ChatCompletionMessageParam[] = [
-      { role: 'system', content: systemPrompt },
+      { role: ‘system’, content: systemPrompt },
       ...this.convertMessages(conversationHistory),
-      { role: 'user', content: userInput }
+      { role: ‘user’, content: userInput }
     ];
 
-    // Convertir les outils
+    // Convert tools
     const tools = this.convertTools(availableTools);
 
     try {
-      // Appel à l'API
+      // Call to the API
       const response = await this.client.chat.completions.create({
         model: this.model,
         messages,
         tools: tools.length > 0 ? tools : undefined,
-        tool_choice: 'auto', // L'agent décide s'il utilise un outil
+        tool_choice: ‘auto’, // The agent decides whether to use a tool
       });
 
       const choice = response.choices[0];
       const message = choice.message;
 
-      // Vérifier si l'agent veut utiliser des outils
+      // Check if the agent wants to use tools
       const toolCalls: ToolCall[] = [];
       if (message.tool_calls) {
         for (const toolCall of message.tool_calls) {
@@ -175,28 +164,28 @@ export class OpenAIProvider {
       }
 
       return {
-        message: message.content || 'Processing...',
+        message: message.content || ‘Processing...’,
         toolCalls,
-        nextAction: choice.finish_reason === 'stop' ? 'complete' : 'continue',
+        nextAction: choice.finish_reason === ‘stop’ ? 'complete' : ‘continue’,
         metadata: {
           model: this.model,
           tokens: response.usage
         }
       };
     } catch (error: any) {
-      console.error('[OpenAI] Error:', error);
+      console.error(‘[OpenAI] Error:’, error);
       throw new Error(`OpenAI API error: ${error.message}`);
     }
   }
 }
 ```
 
-### Modifier Agent.ts
+### Modify Agent.ts
 
-Mettez à jour la méthode `think()`:
+Update the `think()` method:
 
 ```typescript
-import { OpenAIProvider } from '../llm/openai-provider';
+import { OpenAIProvider } from ‘../llm/openai-provider’;
 
 export class Agent {
   private llmProvider?: OpenAIProvider;
@@ -204,7 +193,7 @@ export class Agent {
   constructor(config: AgentConfig, toolRegistry: ToolRegistry, sessionId?: string) {
     // ... existing code ...
 
-    // Initialiser le LLM provider si API key disponible
+    // Initialize the LLM provider if API key available
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
       this.llmProvider = new OpenAIProvider(apiKey, process.env.OPENAI_MODEL);
@@ -212,24 +201,24 @@ export class Agent {
   }
 
   private async think(input: string): Promise<AgentResponse> {
-    // Si on a un LLM, l'utiliser
+    // If we have an LLM, use it
     if (this.llmProvider) {
       return await this.thinkWithLLM(input);
     }
 
-    // Sinon, fallback sur la simulation
+    // Otherwise, fallback to simulation
     return this.thinkSimulated(input);
   }
 
   private async thinkWithLLM(input: string): Promise<AgentResponse> {
-    console.log('[Agent] Thinking with LLM...');
+    console.log(‘[Agent] Thinking with LLM...’);
 
-    // Récupérer les outils disponibles
+    // Retrieve available tools
     const tools = this.state.config.tools
       .map(name => this.toolRegistry.getTool(name))
       .filter(Boolean) as Tool[];
 
-    // Appeler le LLM
+    // Call the LLM
     return await this.llmProvider!.complete(
       this.state.config.systemPrompt,
       this.state.context.messages,
@@ -239,29 +228,29 @@ export class Agent {
   }
 
   private thinkSimulated(input: string): AgentResponse {
-    // La simulation existante...
+    // The existing simulation...
   }
 }
 ```
 
-### Exemple d'utilisation
+Example of use
 
 ```typescript
-// Maintenant votre agent utilise GPT!
+// Now your agent uses GPT!
 const agent = new Agent(config, globalToolRegistry);
 
-// L'agent comprend des requêtes complexes
+// The agent understands complex requests
 await agent.execute(
-  "Lis le fichier package.json, calcule le nombre total de dépendances, et écris le résultat dans stats.txt"
+  “Read the package.json file, calculate the total number of dependencies, and write the result to stats.txt”
 );
 
-// Le LLM va:
-// 1. Appeler read_file pour lire package.json
-// 2. Compter les dépendances
-// 3. Appeler write_file pour sauvegarder
+// The LLM will:
+// 1. Call read_file to read package.json
+// 2. Count the dependencies
+// 3. Call write_file to save
 ```
 
-## Intégration Anthropic (Claude)
+## Anthropic (Claude) Integration
 
 ### Installation
 
@@ -277,41 +266,41 @@ ANTHROPIC_API_KEY=sk-ant-...
 ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
 ```
 
-### Implémentation
+Implementation
 
-`src/llm/anthropic-provider.ts`:
+src/llm/anthropic-provider.ts:
 
 ```typescript
-import Anthropic from '@anthropic-ai/sdk';
-import { Message, MessageRole, ToolCall, AgentResponse } from '../types/agent.types';
-import { Tool } from '../types/agent.types';
+import Anthropic from “@anthropic-ai/sdk”;
+import { Message, MessageRole, ToolCall, AgentResponse } from “../types/agent.types”;
+import { Tool } from “../types/agent.types”;
 
 export class AnthropicProvider {
   private client: Anthropic;
   private model: string;
 
-  constructor(apiKey: string, model: string = 'claude-3-5-sonnet-20241022') {
+  constructor(apiKey: string, model: string = “claude-3-5-sonnet-20241022”) {
     this.client = new Anthropic({ apiKey });
     this.model = model;
   }
 
   private convertMessages(messages: Message[]): Anthropic.MessageParam[] {
     return messages
-      .filter(m => m.role !== MessageRole.SYSTEM) // System va séparément
+      .filter(m => m.role !== MessageRole.SYSTEM) // System separately
       .map(msg => {
         if (msg.role === MessageRole.TOOL) {
           return {
-            role: 'user' as const,
+            role: “user” as const,
             content: [{
-              type: 'tool_result' as const,
-              tool_use_id: msg.metadata?.toolId || 'unknown',
+              type: “tool_result” as const,
+              tool_use_id: msg.metadata?.toolId || “unknown”,
               content: msg.content
             }]
           };
         }
 
         return {
-          role: msg.role === MessageRole.ASSISTANT ? 'assistant' as const : 'user' as const,
+          role: msg.role === MessageRole.ASSISTANT ? “assistant” as const : “user” as const,
           content: msg.content
         };
       });
@@ -362,7 +351,7 @@ export class AnthropicProvider {
       const toolCalls: ToolCall[] = [];
       let messageContent = '';
 
-      // Claude peut retourner plusieurs content blocks
+      // Claude can return multiple content blocks
       for (const block of response.content) {
         if (block.type === 'text') {
           messageContent += block.text;
@@ -392,13 +381,13 @@ export class AnthropicProvider {
 }
 ```
 
-## Architecture de l'intégration
+## Integration Architecture
 
 ```
 ┌─────────────────────────────────────┐
 │          Agent                      │
 │                                     │
-│  ┌───────────────────────────────┐ │
+│  ┌───────────────────────── ──────┐ │
 │  │   think()                     │ │
 │  │   ↓                           │ │
 │  │   thinkWithLLM()              │ │
@@ -413,102 +402,102 @@ export class AnthropicProvider {
               │
      ┌────────┴─────────┐
      │                  │
-┌────▼─────┐    ┌──────▼──────┐
+┌────▼ ─────┐    ┌──────▼──────┐
 │ OpenAI   │    │ Anthropic   │
 │ Provider │    │ Provider    │
 └──────────┘    └─────────────┘
 ```
 
-## Gestion des Prompts
+## Prompt Management
 
-### System Prompt Efficace
+### Effective System Prompt
 
 ```typescript
-const systemPrompt = `Tu es un agent autonome avec accès à des outils.
+const systemPrompt = `You are an autonomous agent with access to tools.
 
-TES CAPACITÉS:
+YOUR CAPABILITIES:
 ${toolDescriptions}
 
-TES RÈGLES:
-1. Analyse la demande utilisateur
-2. Décide quels outils utiliser et dans quel ordre
-3. Exécute les outils un par un
-4. Synthétise les résultats
-5. Réponds de manière claire et concise
+YOUR RULES:
+1. Analyze the user request
+2. Decide which tools to use and in what order
+3. Execute the tools one by one
+4. Synthesize the results
+5. Respond clearly and concisely
 
 IMPORTANT:
-- Utilise TOUJOURS les outils disponibles plutôt que d'inventer des réponses
-- Si tu ne peux pas faire quelque chose, dis-le clairement
-- Explique ton raisonnement
+- ALWAYS use the available tools rather than inventing answers
+- If you cannot do something, say so clearly
+- Explain your reasoning
 `;
 ```
 
 ### Prompt Engineering Tips
 
-1. **Sois spécifique**: "Tu peux lire des fichiers avec read_file" > "Tu peux interagir avec des fichiers"
+1. **Be specific**: “You can read files with read_file” > “You can interact with files”
 
-2. **Donne des exemples** (few-shot learning):
+2. **Give examples** (few-shot learning):
 ```typescript
 const systemPrompt = `
-EXEMPLES:
+EXAMPLES:
 
-User: "Combien font 2+2?"
-Assistant: [utilise calculator avec expression="2+2"]
+User: “How much is 2+2?”
+Assistant: [uses calculator with expression="2+2"]
 
-User: "Lis config.json"
-Assistant: [utilise read_file avec path="config.json"]
+User: “Read config.json”
+Assistant: [uses read_file with path="config.json"]
 `;
 ```
 
-3. **Structure le prompt**:
+3. **Structure the prompt**:
 ```typescript
 const systemPrompt = `
-IDENTITÉ: ${agentName}
-OBJECTIF: ${agentPurpose}
+IDENTITY: ${agentName}
+PURPOSE: ${agentPurpose}
 
-CAPACITÉS:
+CAPABILITIES:
 ${toolList}
 
-CONTRAINTES:
+CONSTRAINTS:
 ${limitations}
 
-EXEMPLES:
+EXAMPLES:
 ${examples}
 `;
 ```
 
-## Optimisation des Coûts
+## Cost Optimization
 
-### 1. Choisir le bon modèle
+### 1. Choose the right model
 
 ```typescript
-// Pour tâches simples
-const provider = new OpenAIProvider(apiKey, 'gpt-4o-mini'); // 10x moins cher
+// For simple tasks
+const provider = new OpenAIProvider(apiKey, ‘gpt-4o-mini’); // 10x cheaper
 
-// Pour tâches complexes
-const provider = new OpenAIProvider(apiKey, 'gpt-4o');
+// For complex tasks
+const provider = new OpenAIProvider(apiKey, ‘gpt-4o’);
 ```
 
-### 2. Limiter le contexte
+### 2. Limit the context
 
 ```typescript
-// Garder seulement les N derniers messages
+// Keep only the last N messages
 private getRelevantContext(maxMessages: number = 10): Message[] {
   return this.memory.getRecentMessages(maxMessages);
 }
 ```
 
-### 3. Caching (pour Claude)
+### 3. Caching (for Claude)
 
 ```typescript
-// Claude supporte le prompt caching
+// Claude supports prompt caching
 const response = await this.client.messages.create({
   model: this.model,
   system: [
     {
-      type: 'text',
+      type: “text”,
       text: systemPrompt,
-      cache_control: { type: 'ephemeral' } // Cache ce prompt
+      cache_control: { type: “ephemeral” } // Cache this prompt
     }
   ],
   // ...
@@ -517,7 +506,7 @@ const response = await this.client.messages.create({
 
 ### 4. Streaming
 
-Pour de meilleures UX:
+For a better user experience:
 
 ```typescript
 async completeStream(/* params */): AsyncGenerator<string> {
@@ -536,7 +525,7 @@ async completeStream(/* params */): AsyncGenerator<string> {
 }
 ```
 
-### 5. Monitoring des coûts
+5. Cost Tracking
 
 ```typescript
 class CostTracker {
@@ -552,7 +541,7 @@ class CostTracker {
   }
 
   private calculateCost(usage: any): number {
-    // GPT-4o-mini: $0.15/1M input, $0.60/1M output
+    // GPT-4o-mini: $0.15/1 million inputs, $0.60/1 million outputs
     const inputCost = (usage.prompt_tokens / 1_000_000) * 0.15;
     const outputCost = (usage.completion_tokens / 1_000_000) * 0.60;
     return inputCost + outputCost;
@@ -560,92 +549,23 @@ class CostTracker {
 }
 ```
 
-## Exemple Complet
-
-`src/examples/llm-agent.ts`:
-
-```typescript
-import { Agent } from '../core/agent';
-import { globalToolRegistry } from '../core/tool-registry';
-import { fileTools } from '../tools/file-tools';
-import { utilityTools } from '../tools/utility-tools';
-import 'dotenv/config';
-
-async function main() {
-  // Setup
-  globalToolRegistry.registerMultiple([...fileTools, ...utilityTools]);
-
-  const config = {
-    name: 'IntelligentAssistant',
-    description: 'An AI agent powered by GPT-4',
-    systemPrompt: `Tu es un assistant intelligent avec accès à des outils.
-
-Outils disponibles:
-${globalToolRegistry.getToolDescriptions()}
-
-Utilise ces outils pour répondre aux demandes de l'utilisateur de manière efficace.`,
-    tools: ['read_file', 'write_file', 'calculator', 'get_timestamp'],
-    mode: 'autonomous' as const,
-    memoryConfig: { enabled: true }
-  };
-
-  const agent = new Agent(config, globalToolRegistry);
-
-  // Test avec une requête complexe
-  console.log('=== Test: Complex multi-step task ===\n');
-
-  const response = await agent.execute(`
-    Lis le fichier package.json, compte le nombre total de dépendances
-    (dependencies + devDependencies), multiplie ce nombre par 2,
-    et écris le résultat dans un fichier result.txt
-  `);
-
-  console.log('\nAgent response:', response.message);
-
-  // L'agent devrait:
-  // 1. read_file("package.json")
-  // 2. calculator("nombre_deps * 2")
-  // 3. write_file("result.txt", "résultat")
-}
-
-main().catch(console.error);
-```
-
 ## Debugging LLM Calls
 
-### Logger les prompts
+### Log calls
 
 ```typescript
 class LLMLogger {
   static logCall(messages: any[], tools: any[]) {
-    console.log('\n=== LLM CALL ===');
-    console.log('Messages:', JSON.stringify(messages, null, 2));
-    console.log('Tools:', tools.map(t => t.name));
+    console.log(“\n=== LLM CALL ===”);
+    console.log(“Messages:”, JSON.stringify(messages, null, 2));
+    console.log(“Tools:”, tools.map(t => t.name));
   }
 
   static logResponse(response: any) {
-    console.log('\n=== LLM RESPONSE ===');
-    console.log('Content:', response.message);
-    console.log('Tool calls:', response.toolCalls);
-    console.log('Tokens:', response.metadata?.usage);
+    console.log(“\n=== LLM RESPONSE ===”);
+    console.log(“Content:”, response.message);
+    console.log(“Tool calls:”, response.toolCalls);
+    console.log(“Tokens:”, response.metadata?.usage);
   }
 }
 ```
-
-## Conclusion
-
-Avec un LLM intégré, vos agents deviennent **vraiment** intelligents:
-
-- ✅ Comprennent le langage naturel
-- ✅ Raisonnent sur des tâches complexes
-- ✅ Chaînent des outils intelligemment
-- ✅ S'adaptent au contexte
-
-**Next steps**:
-1. Choisissez votre provider (OpenAI ou Anthropic)
-2. Implémentez le provider
-3. Modifiez `Agent.think()`
-4. Testez avec des requêtes complexes
-5. Optimisez les prompts et coûts
-
-Happy LLM integration! 🧠✨
