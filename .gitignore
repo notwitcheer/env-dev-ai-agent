@@ -44,3 +44,7 @@ coverage/
 tmp/
 temp/
 *.tmp
+
+# Test files (cleanup)
+test-*.js
+quick-test.js

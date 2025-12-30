@@ -15,6 +15,12 @@ npm install
 # Development mode (runs basic agent example with hot reload)
 npm run dev
 
+# DeFi Agent with Claude API (requires ANTHROPIC_API_KEY)
+npm run defi
+
+# DeFi Agent demo mode
+npm run defi:demo
+
 # Build TypeScript to JavaScript
 npm run build
 
@@ -32,10 +38,12 @@ npm run rebuild
 
 ### Core Components
 
-1. **Agent (`src/core/agent.ts`)** - The main agent class that orchestrates thinking, tool execution, and task management
-2. **ToolRegistry (`src/core/tool-registry.ts`)** - Centralized registry for managing and executing tools with validation
-3. **MemoryManager (`src/memory/memory-manager.ts`)** - Handles working memory, conversation history, and persistence
-4. **Types (`src/types/agent.types.ts`)** - Comprehensive type definitions for the entire system
+1. **Agent (`src/core/agent.ts`)** - The basic agent class with simulated reasoning (demo mode)
+2. **ClaudeAgent (`src/core/claude-agent.ts`)** - Advanced agent using real Claude API for reasoning
+3. **ClaudeProvider (`src/llm/claude-provider.ts`)** - Integration layer for Anthropic's Claude API
+4. **ToolRegistry (`src/core/tool-registry.ts`)** - Centralized registry for managing and executing tools with validation
+5. **MemoryManager (`src/memory/memory-manager.ts`)** - Handles working memory, conversation history, and persistence
+6. **Types (`src/types/agent.types.ts`)** - Comprehensive type definitions for the entire system
 
 ### Key Architecture Patterns
 
@@ -63,6 +71,8 @@ const config: AgentConfig = {
 Available built-in tools:
 - **File Tools**: `read_file`, `write_file`, `list_directory`
 - **Utility Tools**: `calculator`, `get_timestamp`, `wait`
+- **DeFi Tools**: `get_crypto_price`, `get_defi_tvl`, `get_crypto_news`, `get_market_sentiment`
+- **Social Monitoring**: `monitor_discord`, `monitor_twitter`, `monitor_telegram`, `find_crypto_alpha`
 
 ### Agent Modes
 
@@ -80,7 +90,9 @@ Available built-in tools:
 
 The project uses environment variables defined in `.env.example`:
 
-- **LLM Provider**: Currently configured for OpenAI/Anthropic (though demo uses simulated reasoning)
+- **Claude API** (Required for DeFi agent): `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`
+- **LLM Provider**: Currently configured for OpenAI/Anthropic (though basic demo uses simulated reasoning)
+- **Social Media APIs** (Optional): `DISCORD_BOT_TOKEN`, `TWITTER_BEARER_TOKEN`, `TELEGRAM_BOT_TOKEN`
 - **Agent Limits**: `AGENT_MAX_ITERATIONS`, `AGENT_MAX_SUBAGENTS`
 - **Memory**: `MEMORY_PERSIST_TO_DISK`, `MEMORY_PATH`
 - **Logging**: `LOG_LEVEL`, `DEBUG_MODE`
@@ -88,8 +100,9 @@ The project uses environment variables defined in `.env.example`:
 ## Key Entry Points
 
 - **Main Export** (`src/index.ts`): Exports all core components for external use
-- **Demo Example** (`src/examples/basic-agent.ts`): Comprehensive demonstration of agent capabilities
-- **Tool Collections**: Pre-built tool sets in `src/tools/`
+- **Basic Demo** (`src/examples/basic-agent.ts`): Demonstration with simulated reasoning
+- **DeFi Agent** (`src/examples/defi-agent.ts`): Real-world DeFi agent using Claude API
+- **Tool Collections**: Pre-built tool sets in `src/tools/` (file, utility, DeFi, social monitoring)
 
 ## Development Notes
 

@@ -7,11 +7,20 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/examples/basic-agent.ts",
+    "defi": "tsx src/examples/defi-agent.ts",
+    "defi:demo": "tsx src/examples/defi-agent.ts --demo",
     "demo": "npm run build && node dist/examples/basic-agent.js",
     "clean": "rm -rf dist",
     "rebuild": "npm run clean && npm run build"
   },
-  "keywords": ["ai", "agents", "multi-agent", "tools", "llm", "automation"],
+  "keywords": [
+    "ai",
+    "agents",
+    "multi-agent",
+    "tools",
+    "llm",
+    "automation"
+  ],
   "author": "",
   "license": "MIT",
   "type": "commonjs",
@@ -21,7 +30,13 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "discord.js": "^14.25.1",
     "dotenv": "^17.2.3",
+    "node-fetch": "^3.3.2",
+    "telegraf": "^4.16.3",
     "zod": "^4.2.1"
   }
 }
