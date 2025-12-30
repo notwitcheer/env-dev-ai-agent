@@ -87,7 +87,6 @@ const response = await agent.execute('What is Bitcoin doing today?');
 
 - **CLAUDE.md** - Technical guide for Claude Code
 - **README-DEFI.md** - Detailed DeFi agent documentation
-- **GUIDE_DEBUTANT.md** - Beginner's guide to AI agents and DeFi
 
 ## 🔧 Development Commands
 

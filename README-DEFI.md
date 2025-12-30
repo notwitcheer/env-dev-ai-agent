@@ -1,197 +1,197 @@
-# 🚀 Agent DeFi Intelligent
+# 🚀 Intelligent DeFi Agent
 
-Un assistant IA spécialisé dans la recherche DeFi et crypto, alimenté par Claude d'Anthropic.
+An AI assistant specialized in DeFi and crypto research, powered by Anthropic's Claude.
 
-## 🎯 Qu'est-ce que cet agent fait pour vous ?
+## 🎯 What Does This Agent Do For You?
 
-Votre assistant personnel pour:
+Your personal assistant for:
 
-- 📊 **Surveillance des prix** crypto en temps réel
-- 💰 **Analyse des protocoles DeFi** (TVL, métriques)
-- 📰 **Veille actualités** crypto et DeFi
-- 📱 **Monitoring social** (Discord, Twitter, Telegram)
-- 🎯 **Détection d'opportunités alpha** (airdrops, nouveaux protocoles)
-- 📈 **Analyse du sentiment** de marché (Fear & Greed)
+- 📊 **Real-time crypto price monitoring**
+- 💰 **DeFi protocol analysis** (TVL, metrics)
+- 📰 **Crypto and DeFi news monitoring**
+- 📱 **Social monitoring** (Discord, Twitter, Telegram)
+- 🎯 **Alpha opportunity detection** (airdrops, new protocols)
+- 📈 **Market sentiment analysis** (Fear & Greed)
 
-## ⚡ Démarrage rapide
+## ⚡ Quick Start
 
-### 1. Configuration
+### 1. Setup
 
 ```bash
-# 1. Cloner et installer
-git clone <votre-repo>
+# 1. Clone and install
+git clone <your-repo>
 npm install
 
-# 2. Configurer Claude API
+# 2. Configure Claude API
 cp .env.example .env
-# Éditez .env et ajoutez votre clé Anthropic:
-# ANTHROPIC_API_KEY=sk-ant-api03-votre-clé
+# Edit .env and add your Anthropic key:
+# ANTHROPIC_API_KEY=sk-ant-api03-your-key
 ```
 
-### 2. Obtenir une clé API Claude
+### 2. Get Claude API Key
 
-1. Allez sur [console.anthropic.com](https://console.anthropic.com/)
-2. Créez un compte (5$ de crédits gratuits)
-3. Générez une clé API
-4. Ajoutez-la dans votre fichier `.env`
+1. Go to [console.anthropic.com](https://console.anthropic.com/)
+2. Create an account ($5 free credits)
+3. Generate an API key
+4. Add it to your `.env` file
 
-### 3. Lancer l'agent
+### 3. Launch the Agent
 
 ```bash
-# Mode démonstration (exemples prédéfinis)
+# Demo mode (predefined examples)
 npm run defi:demo
 
-# Mode interactif
+# Interactive mode
 npm run defi
 ```
 
-## 🛠️ Exemples d'utilisation
+## 🛠️ Usage Examples
 
-### Questions que vous pouvez poser:
+### Questions you can ask:
 
 ```
-📊 "Quel est le prix actuel d'Ethereum et du Bitcoin?"
+📊 "What's the current Ethereum and Bitcoin price?"
 
-💰 "Quels sont les 5 meilleurs protocoles DeFi par TVL?"
+💰 "What are the top 5 DeFi protocols by TVL?"
 
-📰 "Quelles sont les dernières actualités crypto importantes?"
+📰 "What are the latest important crypto news?"
 
-🎯 "Recherche des opportunités alpha sur les réseaux sociaux"
+🎯 "Find alpha opportunities on social networks"
 
-📈 "Comment est le sentiment du marché aujourd'hui?"
+📈 "How's the market sentiment today?"
 
-🚀 "Y a-t-il des airdrops intéressants en cours?"
+🚀 "Are there any interesting airdrops happening?"
 
-📊 "Compare les prix de Solana, Cardano et Polygon"
+📊 "Compare prices of Solana, Cardano and Polygon"
 ```
 
-## 🔧 Outils disponibles
+## 🔧 Available Tools
 
 ### 💰 Crypto & DeFi
-- `get_crypto_price` - Prix et métriques des cryptos via CoinGecko
-- `get_defi_tvl` - TVL des protocoles DeFi via DeFiLlama
-- `get_crypto_news` - Actualités crypto récentes
+- `get_crypto_price` - Crypto prices and metrics via CoinGecko
+- `get_defi_tvl` - DeFi protocol TVL via DeFiLlama
+- `get_crypto_news` - Recent crypto news
 - `get_market_sentiment` - Fear & Greed Index
 
-### 📱 Monitoring social
-- `monitor_discord` - Surveillance des serveurs Discord
-- `monitor_twitter` - Recherche de tweets avec hashtags
-- `monitor_telegram` - Monitoring des canaux Telegram
-- `find_crypto_alpha` - Détection d'opportunités croisées
+### 📱 Social Monitoring
+- `monitor_discord` - Monitor Discord servers
+- `monitor_twitter` - Search tweets with hashtags
+- `monitor_telegram` - Monitor Telegram channels
+- `find_crypto_alpha` - Cross-platform opportunity detection
 
-### 🔧 Utilitaires
-- `calculator` - Calculs mathématiques
-- `read_file` / `write_file` - Gestion de fichiers
-- `get_timestamp` - Horodatage
+### 🔧 Utilities
+- `calculator` - Mathematical calculations
+- `read_file` / `write_file` - File management
+- `get_timestamp` - Timestamping
 
-## 📈 APIs utilisées (gratuites)
+## 📈 APIs Used (Free)
 
-- **CoinGecko** - Prix et données crypto (pas de clé requise)
-- **DeFiLlama** - TVL des protocoles DeFi (pas de clé requise)
-- **Alternative.me** - Fear & Greed Index (pas de clé requise)
+- **CoinGecko** - Crypto prices and data (no key required)
+- **DeFiLlama** - DeFi protocol TVL (no key required)
+- **Alternative.me** - Fear & Greed Index (no key required)
 
-## 🔑 Configuration avancée (optionnel)
+## 🔑 Advanced Configuration (Optional)
 
-Pour le monitoring social complet, ajoutez dans `.env`:
+For complete social monitoring, add to `.env`:
 
 ```bash
-# Discord Bot (optionnel)
-DISCORD_BOT_TOKEN=votre_token_discord
+# Discord Bot (optional)
+DISCORD_BOT_TOKEN=your_discord_token
 
-# Twitter API (optionnel)
-TWITTER_BEARER_TOKEN=votre_token_twitter
+# Twitter API (optional)
+TWITTER_BEARER_TOKEN=your_twitter_token
 
-# Telegram Bot (optionnel)
-TELEGRAM_BOT_TOKEN=votre_token_telegram
+# Telegram Bot (optional)
+TELEGRAM_BOT_TOKEN=your_telegram_token
 ```
 
-## 💡 Exemples de scénarios d'usage
+## 💡 Usage Scenario Examples
 
-### 🎯 Recherche d'opportunités alpha
+### 🎯 Alpha Opportunity Research
 ```
-Agent: "Recherche des opportunités alpha actuelles"
+User: "Find current alpha opportunities"
 
-Réponse:
-- LayerZero airdrop rumeur (confiance: 85%)
-- Blast L2 early deposit (confiance: 72%)
-- Pendle yield farming (confiance: 68%)
-- Recommandations avec time-sensitive prioritisé
-```
-
-### 📊 Analyse de marché complète
-```
-Agent: "Donne-moi un aperçu complet du marché DeFi"
-
-Réponse:
-- Prix BTC/ETH avec variations 24h
-- Top 5 protocoles DeFi par TVL
-- Fear & Greed Index avec interprétation
-- Actualités importantes du jour
-- Opportunités détectées sur les réseaux
+Response:
+- LayerZero airdrop rumors (confidence: 85%)
+- Blast L2 early deposit (confidence: 72%)
+- Pendle yield farming (confidence: 68%)
+- Recommendations with time-sensitive prioritized
 ```
 
-### 🚨 Surveillance de protocole
+### 📊 Complete Market Analysis
 ```
-Agent: "Surveille Uniswap et Aave, alertes sur discussions importantes"
+User: "Give me a complete DeFi market overview"
 
-Réponse:
-- Configuration monitoring Discord/Twitter
-- Mots-clés: "uniswap v4", "aave governance", "liquidity"
-- Alertes en temps réel sur activité suspecte
+Response:
+- BTC/ETH prices with 24h changes
+- Top 5 DeFi protocols by TVL
+- Fear & Greed Index with interpretation
+- Important news of the day
+- Opportunities detected on social networks
 ```
 
-## 🧠 Comment ça marche ?
+### 🚨 Protocol Monitoring
+```
+User: "Monitor Uniswap and Aave, alert on important discussions"
 
-1. **Claude API** - Raisonnement intelligent et compréhension du contexte
-2. **Outils spécialisés** - Récupération de données crypto/DeFi
-3. **Mémoire persistante** - Historique des conversations
-4. **Analyse croisée** - Corrélation des signaux sociaux
+Response:
+- Configure Discord/Twitter monitoring
+- Keywords: "uniswap v4", "aave governance", "liquidity"
+- Real-time alerts on suspicious activity
+```
 
-## 🛡️ Sécurité et limites
+## 🧠 How It Works
 
-- ✅ **APIs publiques fiables** (CoinGecko, DeFiLlama)
-- ✅ **Pas de trading automatique** (informatif seulement)
-- ⚠️ **Toujours DYOR** (Do Your Own Research)
-- ⚠️ **Vérifiez les informations** avant d'investir
+1. **Claude API** - Intelligent reasoning and context understanding
+2. **Specialized Tools** - Crypto/DeFi data retrieval
+3. **Persistent Memory** - Conversation history
+4. **Cross-Analysis** - Social signal correlation
 
-## 🚀 Développement
+## 🛡️ Security and Limitations
 
-### Structure du projet
+- ✅ **Reliable public APIs** (CoinGecko, DeFiLlama)
+- ✅ **No automatic trading** (informational only)
+- ⚠️ **Always DYOR** (Do Your Own Research)
+- ⚠️ **Verify information** before investing
+
+## 🚀 Development
+
+### Project Structure
 ```
 src/
-├── llm/claude-provider.ts      # Intégration Claude API
-├── core/claude-agent.ts        # Agent intelligent principal
-├── tools/defi-tools.ts         # Outils crypto/DeFi
-├── tools/social-monitoring-tools.ts  # Outils réseaux sociaux
-└── examples/defi-agent.ts      # Exemple d'utilisation
+├── llm/claude-provider.ts      # Claude API integration
+├── core/claude-agent.ts        # Main intelligent agent
+├── tools/defi-tools.ts         # Crypto/DeFi tools
+├── tools/social-monitoring-tools.ts  # Social network tools
+└── examples/defi-agent.ts      # Usage example
 ```
 
-### Ajouter de nouveaux outils
+### Adding New Tools
 ```typescript
-// 1. Créer votre outil
-const monOutil: Tool = {
-  name: 'mon_outil',
-  description: 'Description de mon outil',
+// 1. Create your tool
+const myTool: Tool = {
+  name: 'my_tool',
+  description: 'Description of my tool',
   parameters: [/* ... */],
   async execute(params) {
-    // Votre logique ici
+    // Your logic here
     return { success: true, data: {} };
   }
 };
 
-// 2. L'enregistrer
-globalToolRegistry.register(monOutil);
+// 2. Register it
+globalToolRegistry.register(myTool);
 
-// 3. L'ajouter à la config de l'agent
-tools: ['mon_outil', /* ... */]
+// 3. Add it to agent config
+tools: ['my_tool', /* ... */]
 ```
 
 ## 📞 Support
 
-- 🐛 **Bugs** : Créez une issue GitHub
-- 💡 **Idées** : Proposez des améliorations
-- 📖 **Documentation** : Consultez `CLAUDE.md` pour plus de détails
+- 🐛 **Bugs**: Create a GitHub issue
+- 💡 **Ideas**: Propose improvements
+- 📖 **Documentation**: Check `CLAUDE.md` for more details
 
 ---
 
-**⚠️ Disclaimer**: Cet agent est à des fins éducatives et informatives. Ne constitue pas un conseil financier. Investissez responsablement.
+**⚠️ Disclaimer**: This agent is for educational and informational purposes. Does not constitute financial advice. Invest responsibly.

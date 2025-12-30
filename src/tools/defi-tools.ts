@@ -16,19 +16,19 @@ import { Tool, ToolResult } from '../types/agent.types';
  */
 export const cryptoPriceTool: Tool = {
   name: 'get_crypto_price',
-  description: 'Récupère le prix et les informations d\'une cryptomonnaie',
+  description: 'Retrieves the price and information of a cryptocurrency',
   parameters: [
     {
       name: 'symbol',
       type: 'string',
-      description: 'Symbole de la crypto (ex: bitcoin, ethereum, chainlink)',
+      description: 'Crypto symbol (ex: bitcoin, ethereum, chainlink)',
       required: true,
       schema: z.string().min(1),
     },
     {
       name: 'vs_currency',
       type: 'string',
-      description: 'Devise de référence (usd, eur, btc)',
+      description: 'Reference currency (usd, eur, btc)',
       required: false,
       schema: z.string().default('usd'),
     },
@@ -45,7 +45,7 @@ export const cryptoPriceTool: Tool = {
       if (!data) {
         return {
           success: false,
-          error: `Crypto ${params.symbol} non trouvée. Essayez avec le nom complet (ex: bitcoin au lieu de btc)`,
+          error: `Crypto ${params.symbol} not found. Try with the full name (ex: bitcoin instead of btc)`,
         };
       }
 
@@ -64,7 +64,7 @@ export const cryptoPriceTool: Tool = {
     } catch (error: any) {
       return {
         success: false,
-        error: `Erreur lors de la récupération du prix: ${error.message}`,
+        error: `Error retrieving price: ${error.message}`,
       };
     }
   },
@@ -76,12 +76,12 @@ export const cryptoPriceTool: Tool = {
  */
 export const defiTvlTool: Tool = {
   name: 'get_defi_tvl',
-  description: 'Récupère le TVL (Total Value Locked) des protocoles DeFi',
+  description: 'Retrieves the TVL (Total Value Locked) of DeFi protocols',
   parameters: [
     {
       name: 'protocol',
       type: 'string',
-      description: 'Nom du protocole DeFi (ex: uniswap, aave, compound) ou "all" pour le top 10',
+      description: 'DeFi protocol name (ex: uniswap, aave, compound) or "all" for top 10',
       required: true,
       schema: z.string().min(1),
     },
@@ -92,7 +92,7 @@ export const defiTvlTool: Tool = {
       const baseUrl = 'https://api.llama.fi';
 
       if (params.protocol.toLowerCase() === 'all') {
-        // Récupérer le top des protocoles
+        // Get top protocols
         const response = await axios.get(`${baseUrl}/protocols`);
         const topProtocols = response.data
           .slice(0, 10)
@@ -114,7 +114,7 @@ export const defiTvlTool: Tool = {
           },
         };
       } else {
-        // Récupérer un protocole spécifique
+        // Get specific protocol
         const response = await axios.get(`${baseUrl}/protocol/${params.protocol}`);
         const protocolData = response.data;
 
@@ -137,7 +137,7 @@ export const defiTvlTool: Tool = {
     } catch (error: any) {
       return {
         success: false,
-        error: `Erreur lors de la récupération des données DeFi: ${error.message}`,
+        error: `Error retrieving DeFi data: ${error.message}`,
       };
     }
   },
@@ -149,12 +149,12 @@ export const defiTvlTool: Tool = {
  */
 export const cryptoNewsTool: Tool = {
   name: 'get_crypto_news',
-  description: 'Récupère les dernières actualités crypto et DeFi',
+  description: 'Retrieves the latest crypto and DeFi news',
   parameters: [
     {
       name: 'count',
       type: 'number',
-      description: 'Nombre d\'articles à récupérer (max 10)',
+      description: 'Number of articles to retrieve (max 10)',
       required: false,
       schema: z.number().min(1).max(10).default(5),
     },
@@ -187,7 +187,7 @@ export const cryptoNewsTool: Tool = {
     } catch (error: any) {
       return {
         success: false,
-        error: `Erreur lors de la récupération des news: ${error.message}`,
+        error: `Error retrieving news: ${error.message}`,
       };
     }
   },
@@ -199,7 +199,7 @@ export const cryptoNewsTool: Tool = {
  */
 export const marketSentimentTool: Tool = {
   name: 'get_market_sentiment',
-  description: 'Récupère les indicateurs de sentiment du marché crypto (Fear & Greed Index)',
+  description: 'Retrieves crypto market sentiment indicators (Fear & Greed Index)',
   parameters: [],
 
   async execute(params: Record<string, any>): Promise<ToolResult> {
@@ -226,7 +226,7 @@ export const marketSentimentTool: Tool = {
     } catch (error: any) {
       return {
         success: false,
-        error: `Erreur lors de la récupération du sentiment: ${error.message}`,
+        error: `Error retrieving sentiment: ${error.message}`,
       };
     }
   },
@@ -234,11 +234,11 @@ export const marketSentimentTool: Tool = {
 
 // Fonction helper pour interpréter le Fear & Greed Index
 function interpretFearGreed(value: number): string {
-  if (value <= 25) return 'Fear extrême - Opportunité d\'achat potentielle';
-  if (value <= 45) return 'Fear - Sentiment négatif, mais modéré';
-  if (value <= 55) return 'Neutre - Marché équilibré';
-  if (value <= 75) return 'Greed - Sentiment positif, attention aux corrections';
-  return 'Greed extrême - Risque de correction importante';
+  if (value <= 25) return 'Extreme Fear - Potential buying opportunity';
+  if (value <= 45) return 'Fear - Negative sentiment, but moderate';
+  if (value <= 55) return 'Neutral - Balanced market';
+  if (value <= 75) return 'Greed - Positive sentiment, watch for corrections';
+  return 'Extreme Greed - Risk of major correction';
 }
 
 // Export tous les outils DeFi

@@ -133,16 +133,16 @@ const EXAMPLE_TASKS = [
 async function main() {
   console.log('╔══════════════════════════════════════════════════════════════╗');
   console.log('║                   🚀 DEFI AGENT DEMO 🚀                     ║');
-  console.log('║          Agent intelligent pour la recherche DeFi           ║');
+  console.log('║            Intelligent agent for DeFi research              ║');
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
-  // Vérifier la configuration
+  // Check configuration
   if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('❌ ANTHROPIC_API_KEY non configurée dans .env');
-    console.log('\n📝 Pour utiliser cet agent:');
-    console.log('1. Créez un fichier .env à la racine du projet');
-    console.log('2. Ajoutez: ANTHROPIC_API_KEY=votre_clé_api');
-    console.log('3. Obtenez votre clé sur: https://console.anthropic.com/');
+    console.error('❌ ANTHROPIC_API_KEY not configured in .env');
+    console.log('\n📝 To use this agent:');
+    console.log('1. Create a .env file at the root of the project');
+    console.log('2. Add: ANTHROPIC_API_KEY=your_api_key');
+    console.log('3. Get your key at: https://console.anthropic.com/');
     return;
   }
 
@@ -177,7 +177,7 @@ async function main() {
  */
 async function runDemo(agent: ClaudeAgent) {
   console.log('🎭 === DEMO MODE ===\n');
-  console.log('Exécution de quelques tâches DeFi d\'exemple...\n');
+  console.log('Running some example DeFi tasks...\n');
 
   const demoTasks = [
     "What's the current Ethereum price? Also show me the market sentiment",
@@ -186,67 +186,67 @@ async function runDemo(agent: ClaudeAgent) {
   ];
 
   for (let i = 0; i < demoTasks.length; i++) {
-    console.log(`\n📝 === TÂCHE ${i + 1}/${demoTasks.length} ===`);
+    console.log(`\n📝 === TASK ${i + 1}/${demoTasks.length} ===`);
     console.log(`Question: ${demoTasks[i]}\n`);
 
     const response = await agent.execute(demoTasks[i]);
-    console.log(`\n🤖 Réponse: ${response.message}\n`);
+    console.log(`\n🤖 Response: ${response.message}\n`);
 
     console.log('─'.repeat(80));
 
     if (i < demoTasks.length - 1) {
-      console.log('⏳ Attente 3 secondes...\n');
+      console.log('⏳ Waiting 3 seconds...\n');
       await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
 
-  console.log('\n✅ Demo terminée!');
+  console.log('\n✅ Demo completed!');
   showInteractiveInstructions();
 }
 
 /**
- * Mode interactif
+ * Interactive mode
  */
 async function runInteractiveMode(agent: ClaudeAgent) {
-  console.log('💬 === MODE INTERACTIF ===\n');
-  console.log('🎯 Exemples de questions que vous pouvez poser:');
+  console.log('💬 === INTERACTIVE MODE ===\n');
+  console.log('🎯 Example questions you can ask:');
   EXAMPLE_TASKS.forEach((task, i) => {
     console.log(`   ${i + 1}. ${task}`);
   });
-  console.log('\n💡 Tapez votre question ou "exit" pour quitter...\n');
+  console.log('\n💡 Type your question or "exit" to quit...\n');
 
-  // Simulation mode interactif (en réalité, vous utiliseriez readline)
+  // Interactive mode simulation (in reality, you would use readline)
   const exampleTask = EXAMPLE_TASKS[0];
-  console.log(`📝 Exemple d'exécution: "${exampleTask}"\n`);
+  console.log(`📝 Example execution: "${exampleTask}"\n`);
 
   const response = await agent.execute(exampleTask);
-  console.log(`\n🤖 Réponse: ${response.message}\n`);
+  console.log(`\n🤖 Response: ${response.message}\n`);
 
   showInteractiveInstructions();
 }
 
 /**
- * Affiche les instructions pour utilisation interactive
+ * Show interactive usage instructions
  */
 function showInteractiveInstructions() {
-  console.log('\n📚 === INSTRUCTIONS D\'UTILISATION ===');
-  console.log('\n1. 🔑 Configuration requise (.env):');
-  console.log('   ANTHROPIC_API_KEY=votre_clé_api');
-  console.log('\n2. 🚀 Lancer l\'agent:');
-  console.log('   npm run dev (mode interactif)');
-  console.log('   npm run dev -- --demo (mode démonstration)');
-  console.log('\n3. 💰 APIs utilisées (gratuites):');
-  console.log('   - CoinGecko (prix crypto)');
-  console.log('   - DeFiLlama (TVL DeFi)');
+  console.log('\n📚 === USAGE INSTRUCTIONS ===');
+  console.log('\n1. 🔑 Required configuration (.env):');
+  console.log('   ANTHROPIC_API_KEY=your_api_key');
+  console.log('\n2. 🚀 Launch the agent:');
+  console.log('   npm run defi (interactive mode)');
+  console.log('   npm run defi:demo (demo mode)');
+  console.log('\n3. 💰 APIs used (free):');
+  console.log('   - CoinGecko (crypto prices)');
+  console.log('   - DeFiLlama (DeFi TVL)');
   console.log('   - Alternative.me (Fear & Greed)');
-  console.log('\n4. 🔧 Outils sociaux (configuration optionnelle):');
+  console.log('\n4. 🔧 Social tools (optional configuration):');
   console.log('   - DISCORD_BOT_TOKEN');
   console.log('   - TWITTER_BEARER_TOKEN');
   console.log('   - TELEGRAM_BOT_TOKEN');
 }
 
 /**
- * Catégorise les outils pour l'affichage
+ * Categorize tools for display
  */
 function getCategoryFromToolName(name: string): string {
   if (name.includes('crypto') || name.includes('defi') || name.includes('market')) return '💰';
@@ -256,7 +256,7 @@ function getCategoryFromToolName(name: string): string {
   return '🔧';
 }
 
-// Exécuter si lancé directement
+// Execute if run directly
 if (require.main === module) {
   main().catch(console.error);
 }

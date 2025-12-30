@@ -17,19 +17,19 @@ import axios from 'axios';
  */
 export const discordMonitorTool: Tool = {
   name: 'monitor_discord',
-  description: 'Surveille les messages Discord pour des mots-clés DeFi spécifiques',
+  description: 'Monitors Discord messages for specific DeFi keywords',
   parameters: [
     {
       name: 'keywords',
       type: 'array',
-      description: 'Mots-clés à surveiller (ex: ["airdrop", "defi", "yield"])',
+      description: 'Keywords to monitor (ex: ["airdrop", "defi", "yield"])',
       required: true,
       schema: z.array(z.string()),
     },
     {
       name: 'channels',
       type: 'array',
-      description: 'IDs des canaux Discord à surveiller',
+      description: 'Discord channel IDs to monitor',
       required: false,
       schema: z.array(z.string()),
     },
@@ -43,11 +43,11 @@ export const discordMonitorTool: Tool = {
       return {
         success: true,
         data: {
-          message: 'Monitoring Discord configuré pour les mots-clés: ' + params.keywords.join(', '),
+          message: 'Discord monitoring configured for keywords: ' + params.keywords.join(', '),
           keywords: params.keywords,
           channels: params.channels || ['all'],
           status: 'active',
-          note: 'Configuration Discord requise: DISCORD_BOT_TOKEN dans .env',
+          note: 'Discord configuration required: DISCORD_BOT_TOKEN in .env',
         },
       };
     } catch (error: any) {
